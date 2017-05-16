@@ -15,8 +15,6 @@ import time
 import multiprocessing as mp
 import pickle
 
-
-
 num_insects = 100		#insect population size
 num_hodg = 10			#hodgkinia bottleneck size
 adult_hodg = 3000		#hodgkinia population size in adult insects
@@ -25,7 +23,7 @@ num_generations = 2001	#Number of generations
 inflection_point = 0.7	#Inflection point on the sigmoidal fitness curve
 num_genes = 10			#Number of genes per Hodgkinia genome
 
-#First populate the insect population, and each insect with a hodgkinia population, 
+#First populate the insect population, and each insect with a hodgkinia population,
 #and each hodgkinia with functional genes
 insect_pop = []
 for x in range(0, num_insects):
@@ -42,11 +40,11 @@ for x in range(0, num_insects):
 		insect_pop[x][y].append(1)
 		insect_pop[x][y].append(1)
 		insect_pop[x][y].append(1)
-		
-#Populates a list of host fitnesses, which for now are equal	
+
+#Populates a list of host fitnesses, which for now are equal
 fitness_list = []
 for x in range(0, num_insects):
-	fitness_list.append(1 / float(num_insects))
+	fitness_list.append(1 / num_insects)
 
 #Function that 'grows' the Hodgkinia population from the bottleneck
 #size to the adult size
@@ -63,10 +61,10 @@ def hodg_growth(insect_pop):
 			eighth = insect_pop[x][y][7]
 			ninth = insect_pop[x][y][8]
 			tenth = insect_pop[x][y][9]
-			for z in range(1, (adult_hodg / num_hodg)): # starts at one because there's already one there
+			for z in range(1, (adult_hodg // num_hodg)): # starts at one because there's already one there
 				insect_pop[x].append([first, second, third, fourth, fifth, sixth, seventh, eighth, ninth, tenth])
 	return insect_pop
-	
+
 #Function that calls 10 processes t run the 'single mutation' function
 def mp_mutation(insect_pop):
 	processes = []
@@ -74,14 +72,14 @@ def mp_mutation(insect_pop):
 	temp = []
 	for x in range(10):
 		start_index = prev_end
-		end_index = ((num_insects / 10) * (x + 1))
+		end_index = ((num_insects // 10) * (x + 1))
 		processes.append(mp.Process(target = single_mutation, args = (start_index,end_index, temp)))
-		prev_end = ((num_insects / 10) * (x + 1))
+		prev_end = ((num_insects // 10) * (x + 1))
 	for p in processes:
 		p.daemon = True
 		p.start()
 	for p in processes:
-		while p.is_alive() == True:						
+		while p.is_alive() == True:
 			time.sleep(0.1)
 		p.join()
 	insect_pop = []
@@ -209,16 +207,16 @@ def insect_reproduction(insect_pop, fitness_list):
 			if new_insect_pop[x][y][9] == 0:
 				lost_gene10 += 1
 		#"proportion_geneX" is the proportion of that gene that has been lost
-		proportion_gene1 = float(lost_gene1) / gene1
-		proportion_gene2 = float(lost_gene2) / gene2	
-		proportion_gene3 = float(lost_gene3) / gene3
-		proportion_gene4 = float(lost_gene4) / gene4	
-		proportion_gene5 = float(lost_gene5) / gene5
-		proportion_gene6 = float(lost_gene6) / gene6	
-		proportion_gene7 = float(lost_gene7) / gene7
-		proportion_gene8 = float(lost_gene8) / gene8	
-		proportion_gene9 = float(lost_gene9) / gene9
-		proportion_gene10 = float(lost_gene10) / gene10	
+		proportion_gene1 = lost_gene1 / gene1
+		proportion_gene2 = lost_gene2 / gene2
+		proportion_gene3 = lost_gene3 / gene3
+		proportion_gene4 = lost_gene4 / gene4
+		proportion_gene5 = lost_gene5 / gene5
+		proportion_gene6 = lost_gene6 / gene6
+		proportion_gene7 = lost_gene7 / gene7
+		proportion_gene8 = lost_gene8 / gene8
+		proportion_gene9 = lost_gene9 / gene9
+		proportion_gene10 = lost_gene10 / gene10
 		#Multiply together the proportions of each gene that has been lost
 		#times =  (1 - proportion_gene1) * (1 - proportion_gene2) * (1 - proportion_gene3) * (1 - proportion_gene4) * (1 - proportion_gene5) * (1 - proportion_gene6) * (1 - proportion_gene7) * (1 - proportion_gene7) * (1 - proportion_gene8) * (1 - proportion_gene10)
 		#Find the average proportion of each gene lost
@@ -233,12 +231,12 @@ def insect_reproduction(insect_pop, fitness_list):
 			hmean = scipy.stats.hmean(hmean_list)
 			fitness = (1 / (1+(numpy.exp(-2*((hmean * num_hodg) - (inflection_point * num_hodg))))))
 		fitness_list[x] = fitness
-		
+
 	fitness_sum = sum(fitness_list)
-	avg_fitness = (fitness_sum / float(len(fitness_list)))
-	fitness_range = float(max(fitness_list)) - float(min(fitness_list))
+	avg_fitness = (fitness_sum / len(fitness_list))
+	fitness_range = max(fitness_list) - min(fitness_list)
 	for y in range(0, len(fitness_list)):
-		fitness_list[y] /= float(fitness_sum)
+		fitness_list[y] /= fitness_sum
 	return new_insect_pop, fitness_list, avg_fitness, fitness_range
 
 out = open(sys.argv[1], "w")
@@ -247,10 +245,10 @@ out.write("Generations: %s\n" % num_generations)
 out.write("Inflection point: %s\n\n" % inflection_point)
 out_genotypes = open(sys.argv[1] + ".genotypes", "w")
 
-out.write("Generation\tTotal genes\tLost genes\tAverage fitness\tRange of fitnesses\tCooperators\tNine\tEight\tSeven\tSix\tFive\tFour\tThree\tTwo\tOne\tSelfish\n")	
+out.write("Generation\tTotal genes\tLost genes\tAverage fitness\tRange of fitnesses\tCooperators\tNine\tEight\tSeven\tSix\tFive\tFour\tThree\tTwo\tOne\tSelfish\n")
 #Runs the model for X number of generations, keeps track of genes lost, etc.
 for x in range(num_generations):
-	print "Generation %s" % (x + 1)
+	print("Generation %s" % (x + 1))
 	insect_pop = hodg_growth(insect_pop)
 	insect_pop = mp_mutation(insect_pop)
 	insect_pop, fitness_list, avg_fitness, fitness_range = insect_reproduction(insect_pop, fitness_list)
@@ -296,21 +294,21 @@ for x in range(num_generations):
 				one += 1
 			else:
 				lost_genes += (10 - my_sum)
-	print "Total genes: %s" % total_genes
-	print "Lost_genes: %s" % lost_genes
-	print "Average fitness: %s" % avg_fitness
-	print "Range of fitnesses: %s" % fitness_range
-	print "Cooperators: %s" % cooperators
-	print "Nine: %s" % nine
-	print "Eight: %s" % eight
-	print "Seven: %s" % seven
-	print "Six: %s" % six
-	print "Five: %s" % five
-	print "Four: %s" % four
-	print "Three: %s" % three
-	print "Two: %s" % two
-	print "One: %s" % one
-	print "Selfish: %s\n" % selfish
+	print("Total genes: %s" % total_genes)
+	print("Lost_genes: %s" % lost_genes)
+	print("Average fitness: %s" % avg_fitness)
+	print("Range of fitnesses: %s" % fitness_range)
+	print("Cooperators: %s" % cooperators)
+	print("Nine: %s" % nine)
+	print("Eight: %s" % eight)
+	print("Seven: %s" % seven)
+	print("Six: %s" % six)
+	print("Five: %s" % five)
+	print("Four: %s" % four)
+	print("Three: %s" % three)
+	print("Two: %s" % two)
+	print("One: %s" % one)
+	print("Selfish: %s\n" % selfish)
 	out.write("%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\n" % (x + 1, total_genes, lost_genes, avg_fitness, fitness_range, cooperators, nine, eight, seven, six, five, four, three, two, one, selfish))
 	out_genotypes.write("Generation %s\n" % (x + 1))
 	for y in range(len(insect_pop)):
@@ -319,6 +317,5 @@ for x in range(num_generations):
 			out_genotypes.write("%s\n" % symbiont)
 	if lost_genes == total_genes:
 		out.write("All genes lost after %s generations" % (x + 1))
-		print "All genes lost after %s generations" % (x + 1)
+		print("All genes lost after %s generations" % (x + 1))
 		break
-
