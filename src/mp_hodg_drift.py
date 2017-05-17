@@ -123,17 +123,7 @@ def insect_reproduction(my_insect_pop, my_fitness_list):
         for y in range(0, num_hodg):
             temp_hodg = random.choice(temp[y])
             #XXX: Is this num_hodg or num_insects????
-            first = temp_hodg[0]
-            second = temp_hodg[1]
-            third = temp_hodg[2]
-            fourth = temp_hodg[3]
-            fifth = temp_hodg[4]
-            sixth = temp_hodg[5]
-            seventh = temp_hodg[6]
-            eighth = temp_hodg[7]
-            ninth = temp_hodg[8]
-            tenth = temp_hodg[9]
-            new_insect_pop[x].append([first, second, third, fourth, fifth, sixth, seventh, eighth, ninth, tenth])
+            new_insect_pop[x].append(temp_hodg)
     #Calculate the proportion of each gene that has been lost in each insect
     for x in range(0, num_insects):
         genes = [0] * num_genes
