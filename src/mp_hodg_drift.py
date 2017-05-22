@@ -37,9 +37,10 @@ def hodg_growth(my_insect_pop):
     for x in range(0, num_insects):
         for y in range(0, num_hodg):
             my_genes = []
-            for gene in range(num_genes):
-                my_genes.append(my_insect_pop[x][y][gene])
-            for z in range(1, (adult_hodg // num_hodg)): # starts at one because there's already one there
+            for my_gene in range(num_genes):
+                my_genes.append(my_insect_pop[x][y][my_gene])
+            for _z in range(1, (adult_hodg // num_hodg)):
+                # starts at one because there's already one there
                 my_insect_pop[x].append(list(my_genes))
     return my_insect_pop
 
@@ -73,8 +74,8 @@ def mp_mutation(my_insect_pop):
                 new_insect = []
                 temp = []
             else:
-                for gene in line[:-1]:
-                    temp.append(int(gene))
+                for my_gene in line[:-1]:
+                    temp.append(int(my_gene))
                 new_insect.append(temp)
                 temp = []
         temp_file.close()
@@ -97,9 +98,9 @@ def single_mutation(start_index, end_index):
                         pass
     for item in my_slice:
         temp_out.write("new\n")
-        for hodg in item:
-            for gene in hodg:
-                temp_out.write("%s" % gene)
+        for my_hodg in item:
+            for my_gene in my_hodg:
+                temp_out.write("%s" % my_gene)
             temp_out.write("\n")
     temp_out.write("new\n")
     temp_out.close()
@@ -112,7 +113,7 @@ def insect_reproduction(my_insect_pop, my_fitness_list):
     #Make a list of indices from the insect population, randomly chosen based
     #on weight (fitness)
     one_temp = np.random.choice(len(my_insect_pop),
-                                    num_insects, p=my_fitness_list)
+                                num_insects, p=my_fitness_list)
     #Populate a temporary list with what will be the new insect population
     temp = []
     for item in one_temp:
@@ -122,7 +123,6 @@ def insect_reproduction(my_insect_pop, my_fitness_list):
         new_insect_pop.append([])
         for y in range(0, num_hodg):
             temp_hodg = random.choice(temp[y])
-            #XXX: Is this num_hodg or num_insects????
             new_insect_pop[x].append(temp_hodg)
     #Calculate the proportion of each gene that has been lost in each insect
     for x in range(0, num_insects):
@@ -130,12 +130,12 @@ def insect_reproduction(my_insect_pop, my_fitness_list):
         my_lost_genes = [0] * num_genes
         for y in range(0, num_hodg):
             genes = list(map(lambda x: x + 1, range(num_genes)))
-            for gene in range(num_genes):
-                my_lost_genes[gene] += (1 - new_insect_pop[x][y][0])
+            for my_gene in range(num_genes):
+                my_lost_genes[my_gene] += (1 - new_insect_pop[x][y][0])
         #"proportion_geneX" is the proportion of that gene that has been lost
         proportion_genes = []
-        for gene in range(num_genes):
-            proportion_genes.append(my_lost_genes[gene] / genes[gene])
+        for my_gene in range(num_genes):
+            proportion_genes.append(my_lost_genes[my_gene] / genes[my_gene])
         #Multiply together the proportions of each gene that has been lost
         #times =  (1 - proportion_gene1) * (1 - proportion_gene2) * (1 - proportion_gene3) * (1 - proportion_gene4) * (1 - proportion_gene5) * (1 - proportion_gene6) * (1 - proportion_gene7) * (1 - proportion_gene7) * (1 - proportion_gene8) * (1 - proportion_gene10)
         #Find the average proportion of each gene lost
@@ -164,10 +164,14 @@ out.write("Generations: %s\n" % num_generations)
 out.write("Inflection point: %s\n\n" % inflection_point)
 out_genotypes = open(sys.argv[1] + ".genotypes", "w")
 
-out.write("Generation\tTotal genes\tLost genes\tAverage fitness\tRange of fitnesses\tCooperators\tNine\tEight\tSeven\tSix\tFive\tFour\tThree\tTwo\tOne\tSelfish\n")
+out.write("\t".join(["Generation", "Total genes", "Lost genes",
+                     "Average fitness", "Range of fitnesses",
+                     "Cooperators", "Nine", "Eight", "Seven", "Six",
+                     "Five", "Four", "Three", "Two", "One", "Selfish"]))
+out.write("\n")
 #Runs the model for X number of generations, keeps track of genes lost, etc.
-for x in range(num_generations):
-    print("Generation %s" % (x + 1))
+for generation in range(num_generations):
+    print("Generation %s" % (generation + 1))
     insect_pop = hodg_growth(insect_pop)
     insect_pop = mp_mutation(insect_pop)
     insect_pop, fitness_list, avg_fitness, fitness_range = \
@@ -176,10 +180,10 @@ for x in range(num_generations):
     fragmented = 0
     activated_genes = [0] * (num_genes + 1)
     lost_genes = 0
-    for y in range(0, len(insect_pop)):
-        for z in range(0, len(insect_pop[y])):
+    for insect in range(0, len(insect_pop)):
+        for gene in range(0, len(insect_pop[insect])):
             total_genes += num_genes
-            my_sum = sum(insect_pop[y][z])
+            my_sum = sum(insect_pop[insect][gene])
             activated_genes[my_sum] += 1
             lost_genes += num_genes - my_sum
     print("Total genes: %s" % total_genes)
@@ -191,16 +195,16 @@ for x in range(num_generations):
         print('%d:\t%d' % (cnt_gene, activated_genes[cnt_gene]))
     print("Selfish: %s\n" % activated_genes[0])
     out.write("\t".join(map(lambda x: str(x),
-                            [x + 1, total_genes, lost_genes,
+                            [generation + 1, total_genes, lost_genes,
                              avg_fitness, fitness_range] +
                             activated_genes)))
     out.write('\n')
-    out_genotypes.write("Generation %s\n" % (x + 1))
-    for y in range(len(insect_pop)):
-        out_genotypes.write("Insect %s:\n" % (y + 1))
-        for symbiont in insect_pop[y]:
+    out_genotypes.write("Generation %s\n" % (generation + 1))
+    for num_insect, insect in enumerate(insect_pop):
+        out_genotypes.write("Insect %s:\n" % (num_insect + 1))
+        for symbiont in insect:
             out_genotypes.write("%s\n" % symbiont)
     if lost_genes == total_genes:
-        out.write("All genes lost after %s generations" % (x + 1))
-        print("All genes lost after %s generations" % (x + 1))
+        out.write("All genes lost after %s generations" % (generation + 1))
+        print("All genes lost after %s generations" % (generation + 1))
         break
