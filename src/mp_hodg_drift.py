@@ -1,4 +1,6 @@
 #!/usr/bin/env python
+'''Simulation of Hodgkinia and symbionts
+'''
 
 import multiprocessing as mp
 import random
@@ -11,10 +13,10 @@ import scipy.stats
 num_insects = 100        #insect population size
 num_hodg = 10            #hodgkinia bottleneck size
 adult_hodg = 3000        #hodgkinia population size in adult insects
-mut_rate = 100            #Inverse of the mutation rate
-num_generations = 2001    #Number of generations
-inflection_point = 0.7    #Inflection point on the sigmoidal fitness curve
-num_genes = 10            #Number of genes per Hodgkinia genome
+mut_rate = 100           #Inverse of the mutation rate
+num_generations = 2001   #Number of generations
+inflection_point = 0.7   #Inflection point on the sigmoidal fitness curve
+num_genes = 10           #Number of genes per Hodgkinia genome
 
 #First populate the insect population, and each insect with a hodgkinia population,
 #and each hodgkinia with functional genes
