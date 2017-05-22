@@ -11,7 +11,7 @@ import numpy as np
 import scipy.stats
 
 num_insects = 100        #insect population size
-num_hodg = 10            #hodgkinia bottleneck size
+num_hodg = 11            #hodgkinia bottleneck size
 adult_hodg = 3000        #hodgkinia population size in adult insects
 mut_rate = 100           #Inverse of the mutation rate
 num_generations = 2001   #Number of generations
