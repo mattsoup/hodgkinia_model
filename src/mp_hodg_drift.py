@@ -3,6 +3,7 @@
 '''
 
 import multiprocessing as mp
+import os
 import random
 import sys
 import time
@@ -17,6 +18,15 @@ mut_rate = 100           #Inverse of the mutation rate
 num_generations = 2001   #Number of generations
 inflection_point = 0.7   #Inflection point on the sigmoidal fitness curve
 num_genes = 10           #Number of genes per Hodgkinia genome
+
+
+output_dir = sys.argv[1]
+try:
+    os.mkdir(output_dir)
+except FileExistsError:
+    if not os.path.isdir(output_dir):
+        print("A file with that name already exists")
+        sys.exit(-1)
 
 #First populate the insect population, and each insect with a hodgkinia population,
 #and each hodgkinia with functional genes
@@ -66,7 +76,7 @@ def mp_mutation(my_insect_pop):
         p.join()
     my_insect_pop = []
     for x in range(0, 100, 10):
-        temp_file = open("%s_%s.out" % (x, (x + 10)), "r")
+        temp_file = open(output_dir + os.sep + "%s_%s.out" % (x, (x + 10)), "r")
         temp = []
         new_insect = []
         for line in temp_file:
@@ -86,7 +96,7 @@ def mp_mutation(my_insect_pop):
 
 def single_mutation(start_index, end_index):
     '''Function that mutates the Hodgkinia genes'''
-    temp_out = open("%s_%s.out" % (start_index, end_index), "w")
+    temp_out = open(output_dir + os.sep + "%s_%s.out" % (start_index, end_index), "w")
     my_slice = insect_pop[start_index:end_index]
     for x in range(0, len(my_slice)):
         for y in range(0, len(my_slice[x])):
@@ -160,11 +170,11 @@ def insect_reproduction(my_insect_pop, my_fitness_list):
         my_fitness_list[y] /= fitness_sum
     return new_insect_pop, my_fitness_list, my_avg_fitness, my_fitness_range
 
-out = open(sys.argv[1], "w")
+out = open(output_dir + os.sep + "results.txt", "w")
 out.write("Mutation rate: %s\n" % mut_rate)
 out.write("Generations: %s\n" % num_generations)
 out.write("Inflection point: %s\n\n" % inflection_point)
-out_genotypes = open(sys.argv[1] + ".genotypes", "w")
+out_genotypes = open(output_dir + os.sep + "results.genotypes", "w")
 
 out.write("\t".join(["Generation", "Total genes", "Lost genes",
                      "Average fitness", "Range of fitnesses",
