@@ -13,12 +13,18 @@ import scipy.stats
 
 num_insects = 100        #insect population size
 num_hodg = 11            #hodgkinia bottleneck size
-adult_hodg = 3000        #hodgkinia population size in adult insects
+adult_hodg_factor = 300  #factor by which to increase the num_hodg by in adult insects
+adult_hodg = num_hodg * adult_hodg_factor        #hodgkinia population size in adult insects
 mut_rate = 100           #Inverse of the mutation rate
 num_generations = 2001   #Number of generations
 inflection_point = 0.7   #Inflection point on the sigmoidal fitness curve
 num_genes = 10           #Number of genes per Hodgkinia genome
+mutation_mean = (num_insects * adult_hodg * num_genes) / mut_rate  #Average number of mutations to introduce each insect generation
 
+#some stupid variables for the new mutation function
+cicada_len = len(str(num_insects)) if len(str(num_insects)) == len(str(num_insects - 1)) else len(str(num_insects - 1))
+hodg_len = len(str(adult_hodg)) if len(str(adult_hodg)) == len(str(adult_hodg - 1)) else len(str(adult_hodg - 1))
+gene_len = len(str(num_genes)) if len(str(num_genes)) == len(str(num_genes - 1)) else len(str(num_genes - 1))
 
 output_dir = sys.argv[1]
 try:
@@ -40,7 +46,7 @@ for insect in range(0, num_insects):
 #Populates a list of host fitnesses, which for now are equal
 fitness_list = []
 for insect in range(0, num_insects):
-    fitness_list.append(1 / num_insects)
+    fitness_list.append(1 / float(num_insects)) # one of these needs to be a float, else they will all be zero
 
 
 def hodg_growth(my_insect_pop):
@@ -118,7 +124,22 @@ def single_mutation(start_index, end_index):
     temp_out.close()
     return
 
-
+def all_mutations(insect_pop):
+	'''Function that mutates Hodgkinia genes much faster.
+	   Currently will only work if hodg_len < cicada_len <= gene_len'''
+	num_mutations = int(np.random.normal(mutation_mean, mutation_mean / 4))
+	mutants = random.sample(range(0, mutation_mean * mut_rate), num_mutations)
+	for mutation in mutants:
+		mutation = str(mutation)
+		while len(mutation) < len(str(mutation_mean * mut_rate)):
+			mutation = "0" + mutation
+		hodg = mutation[0:hodg_len]
+		cicada = mutation[hodg_len:hodg_len + cicada_len]
+		gene = mutation[-gene_len:]
+		if insect_pop[int(cicada)][int(hodg)][int(gene)] == 1:
+			insect_pop[int(cicada)][int(hodg)][int(gene)] = 0
+	return insect_pop
+		
 def insect_reproduction(my_insect_pop, my_fitness_list):
     '''Function to reproduce the insect population, based on their fitnesses'''
     new_insect_pop = []
@@ -183,9 +204,11 @@ out.write("\t".join(["Generation", "Total genes", "Lost genes",
 out.write("\n")
 #Runs the model for X number of generations, keeps track of genes lost, etc.
 for generation in range(num_generations):
+    start = time.time()
     print("Generation %s" % (generation + 1))
     insect_pop = hodg_growth(insect_pop)
-    insect_pop = mp_mutation(insect_pop)
+    insect_pop = all_mutations(insect_pop)
+    #insect_pop = mp_mutation(insect_pop)
     insect_pop, fitness_list, avg_fitness, fitness_range = \
         insect_reproduction(insect_pop, fitness_list)
     total_genes = 0
@@ -220,3 +243,5 @@ for generation in range(num_generations):
         out.write("All genes lost after %s generations" % (generation + 1))
         print("All genes lost after %s generations" % (generation + 1))
         break
+    end = time.time()
+    print end - start
