@@ -16,7 +16,7 @@ num_insects = 100        #insect population size
 num_hodg = 11            #hodgkinia bottleneck size
 adult_hodg_factor = 300  #factor by which to increase the num_hodg by in adult insects
 adult_hodg = num_hodg * adult_hodg_factor        #hodgkinia population size in adult insects
-mut_rate = 1000           #Inverse of the mutation rate
+mut_rate = 10000           #Inverse of the mutation rate
 num_generations = 10001   #Number of generations
 inflection_point = 0.7   #Inflection point on the sigmoidal fitness curve
 num_genes = 10           #Number of genes per Hodgkinia genome
@@ -105,16 +105,19 @@ def single_mutation(start_index, end_index):
     '''Function that mutates the Hodgkinia genes'''
     temp_out = open(output_dir + os.sep + "%s_%s.out" % (start_index, end_index), "w")
     my_slice = insect_pop[start_index:end_index]
+    mutants = 0
     for x in range(0, len(my_slice)):
         for y in range(0, len(my_slice[x])):
             for z in range(0, num_genes):
                 mut = random.randint(0, mut_rate)
                 if mut == 7:
+                    mutants += 1
                     #print "MUTANT", x, y, z
                     if my_slice[x][y][z] == 1:
                         my_slice[x][y][z] = 0
                     else:
                         pass
+    print "adding %s mutants" % mutants
     for item in my_slice:
         temp_out.write("new\n")
         for my_hodg in item:
@@ -128,8 +131,10 @@ def single_mutation(start_index, end_index):
 def all_mutations(insect_pop):
 	'''Function that mutates Hodgkinia genes much faster.
 	   Currently will only work if hodg_len > cicada_len >= gene_len'''
-	num_mutations = int(np.random.normal(mutation_mean, mutation_mean / 4))
-	mutants = random.sample(range(0, mutation_mean * mut_rate), num_mutations)
+	num_mutations = int(np.random.normal(mutation_mean, mutation_mean / 20))
+	#mutants = random.sample(range(0, mutation_mean * mut_rate), num_mutations)
+	mutants = [random.randint(0, mutation_mean * mut_rate) for x in range(num_mutations)]
+	print "added %s mutants compared to expected %s" % (len(mutants), mutation_mean)
 	for mutation in mutants:
 		mutation = str(mutation)
 		while len(mutation) < len(str(mutation_mean * mut_rate)):
