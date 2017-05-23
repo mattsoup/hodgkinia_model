@@ -117,7 +117,6 @@ def single_mutation(start_index, end_index):
                         my_slice[x][y][z] = 0
                     else:
                         pass
-    print "adding %s mutants" % mutants
     for item in my_slice:
         temp_out.write("new\n")
         for my_hodg in item:
@@ -134,7 +133,6 @@ def all_mutations(insect_pop):
 	num_mutations = int(np.random.normal(mutation_mean, mutation_mean / 20))
 	#mutants = random.sample(range(0, mutation_mean * mut_rate), num_mutations)
 	mutants = [random.randint(0, mutation_mean * mut_rate) for x in range(num_mutations)]
-	print "added %s mutants compared to expected %s" % (len(mutants), mutation_mean)
 	for mutation in mutants:
 		mutation = str(mutation)
 		while len(mutation) < len(str(mutation_mean * mut_rate)):
