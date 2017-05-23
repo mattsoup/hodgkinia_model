@@ -11,12 +11,13 @@ import time
 import numpy as np
 import scipy.stats
 
+start = time.time()
 num_insects = 100        #insect population size
 num_hodg = 11            #hodgkinia bottleneck size
 adult_hodg_factor = 300  #factor by which to increase the num_hodg by in adult insects
 adult_hodg = num_hodg * adult_hodg_factor        #hodgkinia population size in adult insects
-mut_rate = 100           #Inverse of the mutation rate
-num_generations = 2001   #Number of generations
+mut_rate = 1000           #Inverse of the mutation rate
+num_generations = 10001   #Number of generations
 inflection_point = 0.7   #Inflection point on the sigmoidal fitness curve
 num_genes = 10           #Number of genes per Hodgkinia genome
 mutation_mean = (num_insects * adult_hodg * num_genes) / mut_rate  #Average number of mutations to introduce each insect generation
@@ -126,7 +127,7 @@ def single_mutation(start_index, end_index):
 
 def all_mutations(insect_pop):
 	'''Function that mutates Hodgkinia genes much faster.
-	   Currently will only work if hodg_len < cicada_len <= gene_len'''
+	   Currently will only work if hodg_len > cicada_len >= gene_len'''
 	num_mutations = int(np.random.normal(mutation_mean, mutation_mean / 4))
 	mutants = random.sample(range(0, mutation_mean * mut_rate), num_mutations)
 	for mutation in mutants:
@@ -163,18 +164,19 @@ def insect_reproduction(my_insect_pop, my_fitness_list):
         my_lost_genes = [0] * num_genes
         for y in range(0, num_hodg):
             genes = list(map(lambda x: x + 1, range(num_genes)))
-            for my_gene in range(num_genes):
-                my_lost_genes[my_gene] += (1 - new_insect_pop[x][y][0])
+            for z in range(num_genes):
+                my_lost_genes[z] += (1 - new_insect_pop[x][y][z])
         #"proportion_geneX" is the proportion of that gene that has been lost
         proportion_genes = []
         for my_gene in range(num_genes):
-            proportion_genes.append(my_lost_genes[my_gene] / genes[my_gene])
+            proportion_genes.append(my_lost_genes[my_gene] / float(num_hodg)) #One needs to be a float else there will be many ones and zeroes
         #Multiply together the proportions of each gene that has been lost
         #times =  (1 - proportion_gene1) * (1 - proportion_gene2) * (1 - proportion_gene3) * (1 - proportion_gene4) * (1 - proportion_gene5) * (1 - proportion_gene6) * (1 - proportion_gene7) * (1 - proportion_gene7) * (1 - proportion_gene8) * (1 - proportion_gene10)
         #Find the average proportion of each gene lost
         #avg = ((1 - proportion_gene1) + (1 - proportion_gene2) + (1 - proportion_gene3) + (1 - proportion_gene4) + (1 - proportion_gene5) + (1 - proportion_gene6) + (1 - proportion_gene7) + (1 - proportion_gene8) + (1 - proportion_gene9) + (1 - proportion_gene10)) / float(10)
         #Find the harmonic mean of the proportion of genes retained
         hmean_list = list(map(lambda x: 1 - x, proportion_genes))
+        #print hmean_list
         #Find the fitness for the insect
         #Force the fitness to be zero if all copies of any gene has been lost
         if 0 in hmean_list:
@@ -204,7 +206,6 @@ out.write("\t".join(["Generation", "Total genes", "Lost genes",
 out.write("\n")
 #Runs the model for X number of generations, keeps track of genes lost, etc.
 for generation in range(num_generations):
-    start = time.time()
     print("Generation %s" % (generation + 1))
     insect_pop = hodg_growth(insect_pop)
     insect_pop = all_mutations(insect_pop)
@@ -243,5 +244,6 @@ for generation in range(num_generations):
         out.write("All genes lost after %s generations" % (generation + 1))
         print("All genes lost after %s generations" % (generation + 1))
         break
-    end = time.time()
-    print end - start
+
+end = time.time()
+print "This script took %s seconds" % (end - start)
