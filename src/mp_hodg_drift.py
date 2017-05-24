@@ -2,6 +2,7 @@
 '''Simulation of Hodgkinia and symbionts
 '''
 
+import json
 import multiprocessing as mp
 import os
 import random
@@ -11,23 +12,25 @@ import time
 import numpy as np
 import scipy.stats
 
+conf = json.load(open(sys.argv[1]))
+# This is a bad piece of code, do not emulate
+for key, val in conf.items():
+    op = "float" if val.find('.') > -1 else "int"
+    print("%s = %s(%s)" % (key, op, val))
+    exec("%s = %s(%s)" % (key, op, val))
+output_dir = sys.argv[2]
 start = time.time()
-num_insects = 100        #insect population size
-num_hodg = 11            #hodgkinia bottleneck size
-adult_hodg_factor = 300  #factor by which to increase the num_hodg by in adult insects
-adult_hodg = num_hodg * adult_hodg_factor        #hodgkinia population size in adult insects
-mut_rate = 10000           #Inverse of the mutation rate
-num_generations = 10001   #Number of generations
-inflection_point = 0.7   #Inflection point on the sigmoidal fitness curve
-num_genes = 10           #Number of genes per Hodgkinia genome
-mutation_mean = (num_insects * adult_hodg * num_genes) / mut_rate  #Average number of mutations to introduce each insect generation
+adult_hodg = num_hodg * adult_hodg_factor
+# hodgkinia population size in adult insects
+mutation_mean = (num_insects * adult_hodg * num_genes) / mut_rate
+# Average number of mutations to introduce each insect generation
 
-#some stupid variables for the new mutation function
+
+# some stupid variables for the new mutation function
 cicada_len = len(str(num_insects)) if len(str(num_insects)) == len(str(num_insects - 1)) else len(str(num_insects - 1))
 hodg_len = len(str(adult_hodg)) if len(str(adult_hodg)) == len(str(adult_hodg - 1)) else len(str(adult_hodg - 1))
 gene_len = len(str(num_genes)) if len(str(num_genes)) == len(str(num_genes - 1)) else len(str(num_genes - 1))
 
-output_dir = sys.argv[1]
 try:
     os.mkdir(output_dir)
 except FileExistsError:
@@ -143,7 +146,7 @@ def all_mutations(insect_pop):
 		if insect_pop[int(cicada)][int(hodg)][int(gene)] == 1:
 			insect_pop[int(cicada)][int(hodg)][int(gene)] = 0
 	return insect_pop
-		
+
 def insect_reproduction(my_insect_pop, my_fitness_list):
     '''Function to reproduce the insect population, based on their fitnesses'''
     new_insect_pop = []
@@ -249,4 +252,4 @@ for generation in range(num_generations):
         break
 
 end = time.time()
-print "This script took %s seconds" % (end - start)
+print("This script took %s seconds" % (end - start))
