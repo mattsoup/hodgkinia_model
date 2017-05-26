@@ -13,11 +13,14 @@ import numpy as np
 import scipy.stats
 
 conf = json.load(open(sys.argv[1]))
+
 # This is a bad piece of code, do not emulate
+num_genes = mut_rate = num_insects = adult_hodg_factor = num_hodg = None
 for key, val in conf.items():
     op = "float" if val.find('.') > -1 else "int"
     print("%s = %s(%s)" % (key, op, val))
     exec("%s = %s(%s)" % (key, op, val))
+
 output_dir = sys.argv[2]
 start = time.time()
 adult_hodg = num_hodg * adult_hodg_factor
@@ -131,7 +134,7 @@ def single_mutation(start_index, end_index):
     return
 
 
-def all_mutations(insect_pop):
+def all_mutations(my_insect_pop):
     '''Function that mutates Hodgkinia genes much faster.
 	   Currently will only work if hodg_len > cicada_len >= gene_len'''
     num_mutations = int(np.random.normal(mutation_mean, mutation_mean / 20))
@@ -141,12 +144,12 @@ def all_mutations(insect_pop):
         mutation = str(mutation)
         while len(mutation) < len(str(mutation_mean * mut_rate)):
             mutation = "0" + mutation
-        hodg = mutation[0:hodg_len]
+        my_hodg = mutation[0:hodg_len]
         cicada = mutation[hodg_len:hodg_len + cicada_len]
-        gene = mutation[-gene_len:]
-        if insect_pop[int(cicada)][int(hodg)][int(gene)] == 1:
-            insect_pop[int(cicada)][int(hodg)][int(gene)] = 0
-    return insect_pop
+        my_gene = mutation[-gene_len:]
+        if my_insect_pop[int(cicada)][int(my_hodg)][int(my_gene)] == 1:
+            my_insect_pop[int(cicada)][int(my_hodg)][int(my_gene)] = 0
+    return my_insect_pop
 
 
 def insect_reproduction(my_insect_pop, my_fitness_list):
