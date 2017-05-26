@@ -27,9 +27,9 @@ mutation_mean = (num_insects * adult_hodg * num_genes) / mut_rate
 
 
 # some stupid variables for the new mutation function
-cicada_len = len(str(num_insects)) if len(str(num_insects)) == len(str(num_insects - 1)) else len(str(num_insects - 1))
-hodg_len = len(str(adult_hodg)) if len(str(adult_hodg)) == len(str(adult_hodg - 1)) else len(str(adult_hodg - 1))
-gene_len = len(str(num_genes)) if len(str(num_genes)) == len(str(num_genes - 1)) else len(str(num_genes - 1))
+cicada_len = len(str(num_insects - 1))
+hodg_len = len(str(adult_hodg - 1))
+gene_len = len(str(num_genes - 1))
 
 try:
     os.mkdir(output_dir)
@@ -130,22 +130,24 @@ def single_mutation(start_index, end_index):
     temp_out.close()
     return
 
+
 def all_mutations(insect_pop):
-	'''Function that mutates Hodgkinia genes much faster.
+    '''Function that mutates Hodgkinia genes much faster.
 	   Currently will only work if hodg_len > cicada_len >= gene_len'''
-	num_mutations = int(np.random.normal(mutation_mean, mutation_mean / 20))
+    num_mutations = int(np.random.normal(mutation_mean, mutation_mean / 20))
 	#mutants = random.sample(range(0, mutation_mean * mut_rate), num_mutations)
-	mutants = [random.randint(0, mutation_mean * mut_rate) for x in range(num_mutations)]
-	for mutation in mutants:
-		mutation = str(mutation)
-		while len(mutation) < len(str(mutation_mean * mut_rate)):
-			mutation = "0" + mutation
-		hodg = mutation[0:hodg_len]
-		cicada = mutation[hodg_len:hodg_len + cicada_len]
-		gene = mutation[-gene_len:]
-		if insect_pop[int(cicada)][int(hodg)][int(gene)] == 1:
-			insect_pop[int(cicada)][int(hodg)][int(gene)] = 0
-	return insect_pop
+    mutants = [random.randint(0, mutation_mean * mut_rate) for x in range(num_mutations)]
+    for mutation in mutants:
+        mutation = str(mutation)
+        while len(mutation) < len(str(mutation_mean * mut_rate)):
+            mutation = "0" + mutation
+        hodg = mutation[0:hodg_len]
+        cicada = mutation[hodg_len:hodg_len + cicada_len]
+        gene = mutation[-gene_len:]
+        if insect_pop[int(cicada)][int(hodg)][int(gene)] == 1:
+            insect_pop[int(cicada)][int(hodg)][int(gene)] = 0
+    return insect_pop
+
 
 def insect_reproduction(my_insect_pop, my_fitness_list):
     '''Function to reproduce the insect population, based on their fitnesses'''
