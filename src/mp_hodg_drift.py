@@ -16,6 +16,7 @@ conf = json.load(open(sys.argv[1]))
 
 # This is a bad piece of code, do not emulate
 num_genes = mut_rate = num_insects = adult_hodg_factor = num_hodg = None
+num_generations = None
 for key, val in conf.items():
     op = "float" if val.find('.') > -1 else "int"
     print("%s = %s(%s)" % (key, op, val))
@@ -53,7 +54,8 @@ for insect in range(0, num_insects):
 #Populates a list of host fitnesses, which for now are equal
 fitness_list = []
 for insect in range(0, num_insects):
-    fitness_list.append(1 / float(num_insects)) # one of these needs to be a float, else they will all be zero
+    fitness_list.append(1 / float(num_insects))
+    # one of these needs to be a float, else they will all be zero
 
 
 def hodg_growth(my_insect_pop):
@@ -182,7 +184,7 @@ def insect_reproduction(my_insect_pop, my_fitness_list):
         for my_gene in range(num_genes):
             proportion_genes.append(my_lost_genes[my_gene] / float(num_hodg)) #One needs to be a float else there will be many ones and zeroes
         #Multiply together the proportions of each gene that has been lost
-        #times =  (1 - proportion_gene1) * (1 - proportion_gene2) * (1 - proportion_gene3) * (1 - proportion_gene4) * (1 - proportion_gene5) * (1 - proportion_gene6) * (1 - proportion_gene7) * (1 - proportion_gene7) * (1 - proportion_gene8) * (1 - proportion_gene10)
+        #times =  (1 - proportion_geinsect_pne1) * (1 - proportion_gene2) * (1 - proportion_gene3) * (1 - proportion_gene4) * (1 - proportion_gene5) * (1 - proportion_gene6) * (1 - proportion_gene7) * (1 - proportion_gene7) * (1 - proportion_gene8) * (1 - proportion_gene10)
         #Find the average proportion of each gene lost
         #avg = ((1 - proportion_gene1) + (1 - proportion_gene2) + (1 - proportion_gene3) + (1 - proportion_gene4) + (1 - proportion_gene5) + (1 - proportion_gene6) + (1 - proportion_gene7) + (1 - proportion_gene8) + (1 - proportion_gene9) + (1 - proportion_gene10)) / float(10)
         #Find the harmonic mean of the proportion of genes retained
