@@ -86,13 +86,13 @@ def insect_reproduction(my_insect_pop, my_fitness_list):
     #Calculate the proportion of each gene that has been lost in each insect
     for x in range(num_insects):
         my_start = x * num_hodg * num_genes
-        my_end = my_start + (num_hodg * num_genes)   	
+        my_end = my_start + (num_hodg * num_genes)
         genes = [0] * num_genes
         my_lost_genes = [0] * num_genes
         for y in range(my_start, my_end):
             my_gene = (y + num_genes) % num_genes
             if new_insect_pop[y] == 0:
-                my_lost_genes[my_gene] += 1 
+                my_lost_genes[my_gene] += 1
 #         for y in range(0, num_hodg):
 #             genes = list(map(lambda x: x + 1, range(num_genes)))
 #             for z in range(num_genes):
@@ -146,7 +146,7 @@ for generation in range(num_generations):
     lost_genes = 0
     for insect in range(num_insects):
         my_start = insect * num_hodg * num_genes
-        my_end = my_start + (num_hodg * num_genes)   	
+        my_end = my_start + (num_hodg * num_genes)
         for my_hodg in range(my_start, my_end, num_genes):
             my_genes = insect_pop[my_hodg:my_hodg + num_genes]
             my_sum = sum(my_genes)
@@ -160,7 +160,7 @@ for generation in range(num_generations):
     #print("Cooperators: %s" % active_genes[num_genes])
     for cnt_gene in range(num_genes + 1):
         print('%d genes:\t%d' % (num_genes - cnt_gene, active_genes[cnt_gene]))
-    print "\n"
+    print("\n")
     out.write("\t".join(map(lambda x: str(x),
                             [generation + 1, total_genes, lost_genes,
                              avg_fitness, fitness_range] +
@@ -169,7 +169,7 @@ for generation in range(num_generations):
     out_genotypes.write("Generation %s\n" % (generation + 1))
     for insect in range(num_insects):
         my_start = insect * num_hodg * num_genes
-        my_end = my_start + (num_hodg * num_genes)   	
+        my_end = my_start + (num_hodg * num_genes)
         out_genotypes.write("Insect %s:\n" % (insect + 1))
         for my_hodg in range(my_start, my_end, num_genes):
             my_genes = insect_pop[my_hodg:my_hodg + num_genes]
