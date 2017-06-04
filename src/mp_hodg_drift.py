@@ -55,10 +55,10 @@ class hodg_lineage():
 lineage_list = []
 for x in range(num_insects * num_hodg):
     my_lineage = hodg_lineage()
-    my_lineage.parent = [1] * num_genes
-    my_lineage.genotype = [1] * num_genes
+    my_lineage.parent = "1" * num_genes
+    my_lineage.genotype = "1" * num_genes
     my_lineage.origin_generation = "0"
-    my_lineage.origin_hodg = str(x)
+    my_lineage.origin_hodg = "0"
     lineage_list.append(my_lineage)
 
 def hodg_growth(my_insect_pop, my_lineage_list):
@@ -83,11 +83,11 @@ def all_mutations(my_insect_pop, my_lineage_list):
     for mutant in mutants:
         if my_insect_pop[mutant] == 1:
             current_hodg = mutant / num_genes
-            parent = list(my_insect_pop[current_hodg * num_genes:(current_hodg * num_genes) + num_genes])
+            parent = "".join(str(x) for x in my_insect_pop[current_hodg * num_genes:(current_hodg * num_genes) + num_genes])
             my_insect_pop[mutant] = 0
-            genotype = list(my_insect_pop[current_hodg * num_genes:(current_hodg * num_genes) + num_genes])
+            genotype = "".join(str(x) for x in my_insect_pop[current_hodg * num_genes:(current_hodg * num_genes) + num_genes])
             my_lineage = hodg_lineage()
-            my_lineage.parent = parent
+            my_lineage.parent = parent + "," + str(my_lineage_list[current_hodg].origin_generation) + "," + str(my_lineage_list[current_hodg].origin_hodg)
             my_lineage.genotype = genotype
             my_lineage.origin_generation = generation + 1
             my_lineage.origin_hodg = current_hodg
