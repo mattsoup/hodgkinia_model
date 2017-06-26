@@ -132,8 +132,7 @@ class Conf:
             setattr(self, key, op(val))
 
 
-def simulate(conf_file, output_dir):
-    start = time.time()
+def simulate(conf_file, output_dir, silent=True):
     c = Conf(conf_file)
 
     # hodgkinia population size in adult insects
@@ -147,7 +146,7 @@ def simulate(conf_file, output_dir):
     except FileExistsError:
         if not os.path.isdir(output_dir):
             print("A file with that name already exists")
-            sys.exit(-1)
+            return None
 
     lineage_list = []
     for x in range(c.num_insects * c.num_hodg):
@@ -179,7 +178,8 @@ def simulate(conf_file, output_dir):
     # Runs the model for X number of generations
     # keeps track of genes lost, etc.
     for generation in range(c.num_generations):
-        print("Generation %s" % (generation + 1))
+        if not silent:
+            print("Generation %s" % (generation + 1))
         insect_pop, lineage_list = hodg_growth(insect_pop,
                                                lineage_list,
                                                c.adult_hodg_factor,
@@ -207,15 +207,17 @@ def simulate(conf_file, output_dir):
                 active_genes[c.num_genes - my_sum] += 1
                 total_genes += c.num_genes
                 lost_genes += (c.num_genes - my_sum)
-        print("Total genes: %s" % total_genes)
-        print("Lost_genes: %s" % lost_genes)
-        print("Average fitness: %s" % avg_fitness)
-        print("Range of fitnesses: %s" % fitness_range)
-        # print("Cooperators: %s" % active_genes[num_genes])
-        for cnt_gene in range(c.num_genes + 1):
-            print('%d genes:\t%d' % (c.num_genes - cnt_gene,
-                  active_genes[cnt_gene]))
-        print("\n")
+        if not silent:
+            print("Total genes: %s" % total_genes)
+            print("Lost_genes: %s" % lost_genes)
+            print("Average fitness: %s" % avg_fitness)
+            print("Range of fitnesses: %s" % fitness_range)
+            # print("Cooperators: %s" % active_genes[num_genes])
+            for cnt_gene in range(c.num_genes + 1):
+                print('%d genes:\t%d' % (c.num_genes - cnt_gene,
+                      active_genes[cnt_gene]))
+            print("\n")
+
         out.write("\t".join(map(lambda x: str(x),
                                 [generation + 1, total_genes, lost_genes,
                                  avg_fitness, fitness_range] +
@@ -235,12 +237,14 @@ def simulate(conf_file, output_dir):
 
         if lost_genes == total_genes:
             out.write("All genes lost after %s generations" % (generation + 1))
-            print("All genes lost after %s generations" % (generation + 1))
+            if not silent:
+                print("All genes lost after %s generations" % (generation + 1))
             break
-    end = time.time()
-    print("This script took %s seconds" % (end - start))
 
 if __name__ == "__main__":
+    start = time.time()
     conf_file = sys.argv[1]
     out_dir = sys.argv[2]
-    simulate(conf_file, out_dir)
+    simulate(conf_file, out_dir, False)
+    end = time.time()
+    print("This script took %s seconds" % (end - start))
