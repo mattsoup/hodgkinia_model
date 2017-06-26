@@ -1,8 +1,8 @@
 {
-  "num_insects": "10",
+  "num_insects": "100",
   "num_hodg": "11",
-  "adult_hodg_factor": "3",
-  "mut_rate": "10000",
+  "adult_hodg_factor": "300",
+  "mut_rate": "1000",
   "num_generations": "10001",
   "inflection_point": "0.7",
   "num_genes": "10"
