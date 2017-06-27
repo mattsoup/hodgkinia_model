@@ -160,7 +160,6 @@ def simulate(conf_file, output_dir, silent=True):
     # First populate the insect population, and each insect with a hodgkinia
     # population, and each hodgkinia with functional genes
     insect_pop = [1] * (c.num_insects * c.num_hodg * c.num_genes)
-    insect_pop[7] = 0  # XXX: what is this?
     # Populates a list of host fitnesses, which for now are equal
     fitness_list = [1 / c.num_insects] * c.num_insects
     # one of these needs to be a float, else they will all be zero
