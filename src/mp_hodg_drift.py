@@ -2,6 +2,7 @@
 '''Simulation of Hodgkinia and symbionts
 '''
 
+import copy
 import json
 import multiprocessing as mp
 import os
@@ -25,13 +26,16 @@ def hodg_growth(my_insect_pop, my_lineage_list, adult_hodg_factor, num_genes):
        size to the adult size'''
     new_insect_pop = []
     new_lineage_list = []
-    for x in range(len(my_lineage_list)):
-        for y in range(adult_hodg_factor):
-            new_lineage_list.append(my_lineage_list[x])
-    for x in range(0, len(my_insect_pop), num_genes):
-        for y in range(adult_hodg_factor):
-            for z in range(num_genes):
-                new_insect_pop.append(my_insect_pop[x + z])
+    #for x in range(len(my_lineage_list)):
+    #    for y in range(adult_hodg_factor):
+    #        new_lineage_list.append(my_lineage_list[x])
+    for factor in range(adult_hodg_factor):
+        new_lineage_list.extend(copy.copy(my_lineage_list))
+        new_insect_pop.extend(copy.copy(my_insect_pop))
+    #for x in range(0, len(my_insect_pop), num_genes):
+    #    for y in range(adult_hodg_factor):
+    #        for z in range(num_genes):
+    #            new_insect_pop.append(my_insect_pop[x + z])
     return new_insect_pop, new_lineage_list
 
 
