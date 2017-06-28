@@ -21,7 +21,7 @@ class hodg_lineage():
     origin_hodg = ""
 
 
-def hodg_growth(my_insect_pop, my_lineage_list, adult_hodg_factor, num_genes):
+def hodg_growth(my_insect_pop, my_lineage_list, adult_hodg_factor):
     '''Function that 'grows' the Hodgkinia population from the bottleneck
        size to the adult size'''
     new_insect_pop = []
@@ -185,8 +185,7 @@ def simulate(conf_file, output_dir, silent=True):
             print("Generation %s" % (generation + 1))
         insect_pop, lineage_list = hodg_growth(insect_pop,
                                                lineage_list,
-                                               c.adult_hodg_factor,
-                                               c.num_genes)
+                                               c.adult_hodg_factor)
         insect_pop, lineage_list = all_mutations(insect_pop,
                                                  lineage_list, mutation_mean,
                                                  c.num_insects,
