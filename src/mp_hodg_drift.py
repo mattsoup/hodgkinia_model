@@ -78,6 +78,9 @@ def insect_reproduction(my_insect_pop, my_fitness_list, my_lineage_list,
     new_lineage_list = []
     # Make a list of indices from the insect population, randomly chosen based
     # on weight (fitness)
+    my_sum = float(sum(my_fitness_list))
+    for x in range(len(my_fitness_list)):
+        my_fitness_list[x] = my_fitness_list[x] / my_sum
     to_reproduce = np.random.choice(num_insects,
                                     num_insects, p=my_fitness_list)
     # Populate a temporary list with what will be the new insect population
@@ -119,6 +122,7 @@ def insect_reproduction(my_insect_pop, my_fitness_list, my_lineage_list,
         my_fitness_list[x] = fitness
 
     fitness_sum = sum(my_fitness_list)
+    #assert (fitness_sum != 0), "All insects are extinct"
     my_avg_fitness = fitness_sum / len(my_fitness_list)
     my_fitness_range = max(my_fitness_list) - min(my_fitness_list)
     for y in range(0, len(my_fitness_list)):
@@ -165,7 +169,7 @@ def simulate(conf_file, output_dir, silent=True):
     # population, and each hodgkinia with functional genes
     insect_pop = [1] * (c.num_insects * c.num_hodg * c.num_genes)
     # Populates a list of host fitnesses, which for now are equal
-    fitness_list = [1 / c.num_insects] * c.num_insects
+    fitness_list = [float(1) / c.num_insects] * c.num_insects
     # one of these needs to be a float, else they will all be zero
     out = open(output_dir + os.sep + "results.txt", "w")
     out.write("Mutation rate: %s\n" % c.mut_rate)
