@@ -117,8 +117,8 @@ def insect_reproduction(my_insect_pop, my_fitness_list, my_lineage_list,
             fitness = 0
         else:
             hmean = scipy.stats.hmean(hmean_list)
-            fitness = (1 / (1 + (np.exp(-2 * ((hmean * num_hodg) -
-                       (inflection_point * num_hodg))))))
+            fitness = (1 / (1 + (np.exp(-k * (hmean -
+                       inflection_point)))))
         my_fitness_list[x] = fitness
 
     fitness_sum = sum(my_fitness_list)
