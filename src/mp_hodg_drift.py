@@ -72,7 +72,7 @@ def all_mutations(my_insect_pop, my_lineage_list, mutation_mean,
 
 def insect_reproduction(my_insect_pop, my_fitness_list, my_lineage_list,
                         num_insects, adult_hodg, num_genes, num_hodg,
-                        inflection_point):
+                        inflection_point, k):
     '''Function to reproduce the insect population, based on their fitnesses'''
     new_insect_pop = []
     new_lineage_list = []
@@ -199,7 +199,7 @@ def simulate(conf_file, output_dir, silent=True):
         insect_pop, fitness_list, avg_fitness, fitness_range, lineage_list = \
             insect_reproduction(insect_pop, fitness_list, lineage_list,
                                 c.num_insects, adult_hodg, c.num_genes,
-                                c.num_hodg, c.inflection_point)
+                                c.num_hodg, c.inflection_point, c.k)
         total_genes = 0
         fragmented = 0
         active_genes = [0] * (c.num_genes + 1)
