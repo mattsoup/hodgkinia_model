@@ -6,5 +6,6 @@
   "num_generations": "10001",
   "inflection_point": "0.7",
   "num_genes": "10",
-  "k": "10"
+  "k": "10",
+  "low_fitness": "0.0"
 }

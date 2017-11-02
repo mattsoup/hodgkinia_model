@@ -72,7 +72,7 @@ def all_mutations(my_insect_pop, my_lineage_list, mutation_mean,
 
 def insect_reproduction(my_insect_pop, my_fitness_list, my_lineage_list,
                         num_insects, adult_hodg, num_genes, num_hodg,
-                        inflection_point, k):
+                        inflection_point, k, low_fitness):
     '''Function to reproduce the insect population, based on their fitnesses'''
     new_insect_pop = []
     new_lineage_list = []
@@ -111,15 +111,7 @@ def insect_reproduction(my_insect_pop, my_fitness_list, my_lineage_list,
             # One needs to be a float else there will be many ones and zeroes
         # Find the harmonic mean of the proportion of genes retained
         hmean_list = list(map(lambda x: 1 - x, proportion_genes))
-        # Find the fitness for the insect
-        # Force the fitness to be zero if all copies of any gene has been lost
-        if 0 in hmean_list:
-            fitness = 0
-        else:
-            hmean = scipy.stats.hmean(hmean_list)
-            fitness = (1 / (1 + (np.exp(-k * (hmean -
-                       inflection_point)))))
-        my_fitness_list[x] = fitness
+        my_fitness_list[x] = calc_fitness(hmean_list, k, inflection_point, low_fitness)
 
     fitness_sum = sum(my_fitness_list)
     #assert (fitness_sum != 0), "All insects are extinct"
@@ -130,6 +122,14 @@ def insect_reproduction(my_insect_pop, my_fitness_list, my_lineage_list,
     return (new_insect_pop, my_fitness_list, my_avg_fitness,
             my_fitness_range, new_lineage_list)
 
+def calc_fitness(my_hmean_list, k, inflection_point, low_fitness):
+    if 0 not in my_hmean_list:
+        hmean = scipy.stats.hmean(my_hmean_list)
+        fitness = (1 / (1 + (np.exp(-k * (hmean - 
+                   inflection_point)))))
+    else:
+        fitness = low_fitness
+    return fitness
 
 class Conf:
     def __init__(self, conf_file):
@@ -148,6 +148,8 @@ def simulate(conf_file, output_dir, silent=True):
 
     # Average number of mutations to introduce each insect generation
     mutation_mean = (c.num_insects * adult_hodg * c.num_genes) / c.mut_rate
+    
+    low_fitness = c.low_fitness
 
     try:
         os.mkdir(output_dir)
@@ -199,7 +201,7 @@ def simulate(conf_file, output_dir, silent=True):
         insect_pop, fitness_list, avg_fitness, fitness_range, lineage_list = \
             insect_reproduction(insect_pop, fitness_list, lineage_list,
                                 c.num_insects, adult_hodg, c.num_genes,
-                                c.num_hodg, c.inflection_point, c.k)
+                                c.num_hodg, c.inflection_point, c.k, low_fitness)
         total_genes = 0
         fragmented = 0
         active_genes = [0] * (c.num_genes + 1)
