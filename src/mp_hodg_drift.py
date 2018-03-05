@@ -21,17 +21,34 @@ class hodg_lineage():
     origin_hodg = ""
 
 
-def hodg_growth(my_insect_pop, my_lineage_list, adult_hodg_factor):
+def hodg_growth(my_insect_pop, my_lineage_list, adult_hodg_factor,
+                num_hodg, num_insects, num_genes):
     '''Function that 'grows' the Hodgkinia population from the bottleneck
        size to the adult size'''
     new_insect_pop = []
     new_lineage_list = []
+#     print(my_insect_pop)
     #for x in range(len(my_lineage_list)):
     #    for y in range(adult_hodg_factor):
     #        new_lineage_list.append(my_lineage_list[x])
-    for factor in range(adult_hodg_factor):
-        new_lineage_list.extend(copy.copy(my_lineage_list))
-        new_insect_pop.extend(copy.copy(my_insect_pop))
+
+    # Grows all Hodgkinia cells by a set number (adult_hodg_factor)
+#     for factor in range(adult_hodg_factor):
+#         new_lineage_list.extend(copy.copy(my_lineage_list))
+#         new_insect_pop.extend(copy.copy(my_insect_pop))
+    to_reproduce = [np.random.choice(num_hodg, (adult_hodg_factor * num_hodg))
+                    for x in range(num_insects)]
+#     print(to_reproduce)
+    for x in range(0, len(to_reproduce)):
+        insect_start = x * num_hodg * num_genes
+        insect_end = insect_start + (num_hodg * num_genes)
+#         print("insect", x)
+        for my_hodg in to_reproduce[x]:
+            genes = my_insect_pop[insect_start + (my_hodg * num_genes):insect_start + (my_hodg * num_genes) + num_genes]
+#             print(genes, my_hodg)
+            for gene in genes:
+                new_insect_pop.append(gene)
+#     print new_insect_pop
     #for x in range(0, len(my_insect_pop), num_genes):
     #    for y in range(adult_hodg_factor):
     #        for z in range(num_genes):
@@ -50,23 +67,23 @@ def all_mutations(my_insect_pop, my_lineage_list, mutation_mean,
     for mutant in mutants:
         if my_insect_pop[mutant] == 1:
             current_hodg = mutant // num_genes
-            parent = "".join(
-                str(x)
-                for x in my_insect_pop[current_hodg * num_genes:
-                                       (current_hodg * num_genes) + num_genes])
+#             parent = "".join(
+#                 str(x)
+#                 for x in my_insect_pop[current_hodg * num_genes:
+#                                        (current_hodg * num_genes) + num_genes])
             my_insect_pop[mutant] = 0
-            genotype = "".join(
-                str(x)
-                for x in my_insect_pop[current_hodg * num_genes:
-                                       (current_hodg * num_genes) + num_genes])
-            my_lineage = hodg_lineage()
-            my_lineage.parent = parent + "," + str(
-                my_lineage_list[current_hodg].origin_generation) + "," + str(
-                    my_lineage_list[current_hodg].origin_hodg)
-            my_lineage.genotype = genotype
-            my_lineage.origin_generation = generation + 1
-            my_lineage.origin_hodg = current_hodg
-            my_lineage_list[current_hodg] = my_lineage
+#             genotype = "".join(
+#                 str(x)
+#                 for x in my_insect_pop[current_hodg * num_genes:
+#                                        (current_hodg * num_genes) + num_genes])
+#             my_lineage = hodg_lineage()
+#             my_lineage.parent = parent + "," + str(
+#                 my_lineage_list[current_hodg].origin_generation) + "," + str(
+#                     my_lineage_list[current_hodg].origin_hodg)
+#             my_lineage.genotype = genotype
+#             my_lineage.origin_generation = generation + 1
+#             my_lineage.origin_hodg = current_hodg
+#             my_lineage_list[current_hodg] = my_lineage
     return my_insect_pop, my_lineage_list
 
 
@@ -90,8 +107,8 @@ def insect_reproduction(my_insect_pop, my_fitness_list, my_lineage_list,
         my_end = my_start + (adult_hodg * num_genes)
         for x in range(num_hodg):
             my_hodg = random.randint(0, adult_hodg - 1)
-            new_lineage_list.append(my_lineage_list[(item * adult_hodg) +
-                                                    my_hodg])
+#             new_lineage_list.append(my_lineage_list[(item * adult_hodg) +
+#                                                     my_hodg])
             for y in range(my_start + (my_hodg * num_genes), my_start +
                            (my_hodg * num_genes) + num_genes):
                 new_insect_pop.append(my_insect_pop[y])
@@ -147,7 +164,7 @@ def simulate(conf_file, output_dir, silent=True):
     adult_hodg = c.num_hodg * c.adult_hodg_factor
 
     # Average number of mutations to introduce each insect generation
-    mutation_mean = (c.num_insects * adult_hodg * c.num_genes) / c.mut_rate
+    mutation_mean = float(c.num_insects * adult_hodg * c.num_genes) / c.mut_rate
     
     low_fitness = c.low_fitness
 
@@ -187,11 +204,14 @@ def simulate(conf_file, output_dir, silent=True):
     # Runs the model for X number of generations
     # keeps track of genes lost, etc.
     for generation in range(c.num_generations):
-        if not silent:
-            print("Generation %s" % (generation + 1))
+#         if not silent:
+#             print("Generation %s" % (generation + 1))
         insect_pop, lineage_list = hodg_growth(insect_pop,
                                                lineage_list,
-                                               c.adult_hodg_factor)
+                                               c.adult_hodg_factor,
+                                               c.num_hodg,
+                                               c.num_insects,
+                                               c.num_genes)
         insect_pop, lineage_list = all_mutations(insect_pop,
                                                  lineage_list, mutation_mean,
                                                  c.num_insects,
@@ -215,33 +235,33 @@ def simulate(conf_file, output_dir, silent=True):
                 active_genes[c.num_genes - my_sum] += 1
                 total_genes += c.num_genes
                 lost_genes += (c.num_genes - my_sum)
-        if not silent:
-            print("Total genes: %s" % total_genes)
-            print("Lost_genes: %s" % lost_genes)
-            print("Average fitness: %s" % avg_fitness)
-            print("Range of fitnesses: %s" % fitness_range)
-            # print("Cooperators: %s" % active_genes[num_genes])
-            for cnt_gene in range(c.num_genes + 1):
-                print('%d genes:\t%d' % (c.num_genes - cnt_gene,
-                      active_genes[cnt_gene]))
-            print("\n")
+#         if not silent:
+#             print("Total genes: %s" % total_genes)
+#             print("Lost_genes: %s" % lost_genes)
+#             print("Average fitness: %s" % avg_fitness)
+#             print("Range of fitnesses: %s" % fitness_range)
+#             # print("Cooperators: %s" % active_genes[num_genes])
+#             for cnt_gene in range(c.num_genes + 1):
+#                 print('%d genes:\t%d' % (c.num_genes - cnt_gene,
+#                       active_genes[cnt_gene]))
+#             print("\n")
 
         out.write("\t".join(map(lambda x: str(x),
                                 [generation + 1, total_genes, lost_genes,
                                  avg_fitness, fitness_range] +
                                 active_genes)))
         out.write('\n')
-        out_genotypes.write("Generation %s\n" % (generation + 1))
-        for x in range(len(lineage_list)):
-            for item in lineage_list[x].parent:
-                out_genotypes.write(str(item))
-            out_genotypes.write("\t")
-            for item in lineage_list[x].genotype:
-                out_genotypes.write(str(item))
-            out_genotypes.write("\t")
-            out_genotypes.write("%s\t%s\n" % (
-                lineage_list[x].origin_generation,
-                lineage_list[x].origin_hodg))
+#         out_genotypes.write("Generation %s\n" % (generation + 1))
+#         for x in range(len(lineage_list)):
+#             for item in lineage_list[x].parent:
+#                 out_genotypes.write(str(item))
+#             out_genotypes.write("\t")
+#             for item in lineage_list[x].genotype:
+#                 out_genotypes.write(str(item))
+#             out_genotypes.write("\t")
+#             out_genotypes.write("%s\t%s\n" % (
+#                 lineage_list[x].origin_generation,
+#                 lineage_list[x].origin_hodg))
 
         if lost_genes == total_genes:
             out.write("All genes lost after %s generations" % (generation + 1))
